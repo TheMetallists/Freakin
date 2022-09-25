@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Freakin\'</string>
+    <string name="navigation_drawer_open">Открыть меню навигации</string>
+    <string name="navigation_drawer_close">Закрыть меню навигации</string>
+    <string name="nav_header_desc">Заголовок навигации</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_mission_abort">ВЫЙТИ ПРИНУДИТЕЛЬНО</string>
+    <string name="action_switch_screen_wl">Переключить WakeLock экрана</string>
+    <string name="action_crash_that_trash">Отладка: крашнуть прогу!</string>
+    <string name="msg_screenwl_enabled">"WakeLock экрана ВКЛЮЧЁН!!! Запасайтесь powerbank-ами. "</string>
+    <string name="msg_screenwl_disabled">WakeLock экрана Выключен. Аккумулятора хватит на дольше.</string>
+    <string name="menu_home">Главное</string>
+    <string name="menu_netlist">Список сетей</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="sets_hdg_tools">Примочки</string>
+    <string name="sets_hdg_sfx">Звуковый эффекты</string>
+    <string name="sets_hdg_sfx_debug">Расширенные звуковые эффекты</string>
+    <string name="sets_hdg_auth">Авторизация</string>
+    <string name="sets_hdg_conn">Соединение</string>
+    <string name="sets_hdg_acc">Аккаунт</string>
+    <string name="acc_def_country">Зимбабве</string>
+    <string name="acc_def_city">Глюкенбург</string>
+    <string name="acc_ptt_timeout">Таймаут PTT (0=отключен)</string>
+    <string name="svc_not_title">FRN клиент</string>
+    <string name="svc_not_text">Сервис запущен</string>
+    <string name="sets_ptt_method">Метод активации PTT</string>
+    <string name="acc_ptt_none">Нет (экранная кнопка)</string>
+    <string name="acc_ptt_kup">Качелька громкости ВВЕРХ</string>
+    <string name="acc_ptt_kdn">Качелька громкости ВНИЗ</string>
+    <string name="mnu_item_conn">Соединение</string>
+    <string name="opt_hytera_mode">Режим Хайтеры</string>
+    <string name="opt_hytera_mode_desc">Поддержка PRC терминалов Hytera. P1=настройки, P2=rjvyfns</string>
+    <string name="opt_ptt_inhibit">Запретить передачу</string>
+    <string name="opt_ptt_inhibit_desc">Защита от детей, чайников и случайных нажатий в кармане.</string>
+    <string name="opt_compressor">Компрессор</string>
+    <string name="opt_compressor_desc">Пропускать звук из микрофона через компрессор.</string>
+    <string name="opt_lpf">ФВЧ</string>
+    <string name="opt_lpf_desc">ФВЧ для срезания басов</string>
+    <string name="opt_awakeness_mode">WakeLock экрана</string>
+    <string name="opt_awakeness_mode_desc">Держать экран включённым пока приложение работает. СОЖРЁТ АКУМ, ЕСЛИ ЗАБЫТЬ.</string>
+    <string name="opt_sfx_filter1_cutoff_title">Частота среза первого ФВЧ</string>
+    <string name="opt_sfx_filter1_q_title">Q первого ФВЧ</string>
+    <string name="opt_sfx_filter2_cutoff_title">Частота среза второго ФВЧ</string>
+    <string name="opt_sfx_filte_multiplier_title">Усиление после фильтров</string>
+    <string name="opt_compressor_mgain_title">Компрессор: предусиление</string>
+    <string name="opt_compressor_treshold_title">Компрессор: порог</string>
+    <string name="opt_compressor_ratio_title">Компрессор: отношение (ratio)</string>
+    <string name="opt_compressor_release_title">Компрессор: release в секундах</string>
+    <string name="opt_sfx_fatality">Настройки спецэффектов неверные. Сбросьте настройки приложения!</string>
+    <string name="error_unauthorized">Ошибка авторизации.\nПроверьте пароли или найдите ломик.</string>
+    <string name="error_unknown">Неизвестная ошибка. Проверьте сетку и ADB LOGCAT.</string>
+    <string name="msg_raum_set">Комната выбрана. Пожалуйста, переподключитесь.</string>
+    <string name="label_connect">ПОДКЛ</string>
+    <string name="label_disconnect">ОТКЛ</string>
+    <string name="label_btn_save">Сохранить</string>
+    <string name="label_btn_clear">Отмена</string>
+    <string name="acra_sendmail_required">Хотите послать разработчику отчёт об ошибке?</string>
+    <string name="nda_trashcan_selferror">Не могу инициализировать отлов ошибок NDK!</string>
+    <string name="flavor_main">Версия: Стандарт</string>
+    <string name="flavor_histeria">Версия: ХайТерра</string>
+    <string name="flavor_audiophile">Версия: Аудиофильская</string>
+</resources>

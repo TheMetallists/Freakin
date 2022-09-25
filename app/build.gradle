@@ -1,0 +1,78 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdkVersion 32
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "aq.metallists.freundschaft"
+        minSdkVersion 16
+        targetSdkVersion 32
+        versionCode 12
+        versionName "1.2"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+        }
+    }
+
+    flavorDimensions "variances"
+    productFlavors {
+        vPrimary {
+            dimension "variances"
+            versionNameSuffix "-demo"
+        }
+        vHighterra {
+            dimension "variances"
+            versionNameSuffix "-highterra"
+        }
+        vAudiophile {
+            dimension "variances"
+            versionNameSuffix "-audiophile"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
+    }
+
+    ndkVersion '21.1.6352462'
+}
+
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.navigation:navigation-fragment:2.5.2'
+    implementation 'androidx.navigation:navigation-ui:2.5.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    def acraVersion = "5.7.0"
+    //def acraVersion = "4.9.0"
+    implementation "ch.acra:acra-dialog:$acraVersion"
+    implementation "ch.acra:acra-mail:$acraVersion"
+
+    implementation 'ru.ivanarh.ndcrash:jndcrash-libunwind:0.8'
+}
