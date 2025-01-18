@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="aq.metallists.freundschaft">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -19,11 +20,10 @@
             android:name=".service.FreundschaftService"
             android:enabled="true"
             android:exported="false"
-            android:permission="TODO" />
+            android:permission="TODO"
+            android:foregroundServiceType="microphone"
+            />
 
-        <service
-            android:name="ru.ivanarh.jndcrash.NDCrashService"
-            android:process=":reportprocess" />
 
         <activity
             android:name=".MainActivity"

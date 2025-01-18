@@ -95,7 +95,7 @@ public class FreundschaftService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Intent pit = new Intent(this, MainActivity.class);
-        PendingIntent pid = PendingIntent.getActivity(this, 0, pit, 0);
+        PendingIntent pid = PendingIntent.getActivity(this, 0, pit, PendingIntent.FLAG_MUTABLE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             this.startMyOwnForeground();
@@ -256,7 +256,7 @@ public class FreundschaftService extends Service {
 
     private void setRxTxStatus(int mode) {
         Intent ni = new Intent(this, MainActivity.class);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, ni, 0);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, ni, PendingIntent.FLAG_MUTABLE);
 
         int icn = R.drawable.ic_freakin_tray;
         if (mode == 1) {

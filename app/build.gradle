@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
-    buildToolsVersion "30.0.3"
+    compileSdk 34
+    buildToolsVersion '34.0.0'
 
     defaultConfig {
         applicationId "aq.metallists.freundschaft"
         minSdkVersion 16
-        targetSdkVersion 32
+        targetSdk 34
         versionCode 12
         versionName "1.2"
 
@@ -51,7 +51,8 @@ android {
         }
     }
 
-    ndkVersion '21.1.6352462'
+    ndkVersion '22.0.7026061'
+    namespace 'aq.metallists.freundschaft'
 }
 
 
@@ -74,5 +75,5 @@ dependencies {
     implementation "ch.acra:acra-dialog:$acraVersion"
     implementation "ch.acra:acra-mail:$acraVersion"
 
-    implementation 'ru.ivanarh.ndcrash:jndcrash-libunwind:0.8'
+    //implementation 'ru.ivanarh.ndcrash:jndcrash-libunwind:0.8'
 }

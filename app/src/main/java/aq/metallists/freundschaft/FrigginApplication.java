@@ -11,10 +11,10 @@ import org.acra.config.DialogConfigurationBuilder;
 import org.acra.config.MailSenderConfigurationBuilder;
 import org.acra.data.StringFormat;
 
-import ru.ivanarh.jndcrash.NDCrash;
+/*import ru.ivanarh.jndcrash.NDCrash;
 import ru.ivanarh.jndcrash.NDCrashError;
 import ru.ivanarh.jndcrash.NDCrashService;
-import ru.ivanarh.jndcrash.NDCrashUnwinder;
+import ru.ivanarh.jndcrash.NDCrashUnwinder;*/
 
 
 @AcraCore(buildConfigClass = BuildConfig.class)
@@ -38,7 +38,7 @@ public class FrigginApplication extends Application {
     public void onCreate() {
         super.onCreate();
         final String reportPath = getExternalFilesDir("crashes").getAbsolutePath() + "/crash.txt"; // Example.
-        final NDCrashError error = NDCrash.initializeOutOfProcess(
+        /*final NDCrashError error = NDCrash.initializeOutOfProcess(
                 this,
                 reportPath,
                 NDCrashUnwinder.libunwind,
@@ -48,7 +48,7 @@ public class FrigginApplication extends Application {
         } else {
             // Initialization failed, check error value.
             Toast.makeText(this.getApplicationContext(), R.string.nda_trashcan_selferror, Toast.LENGTH_LONG).show();
-        }
+        }*/
     }
 
     @Override
