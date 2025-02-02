@@ -1,0 +1,99 @@
+<resources>
+    <string name="app_name">Freakin\'</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title" translatable="false">Android FReakiN\'</string>
+    <string name="nav_header_subtitle" translatable="false">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_mission_abort">ABORT &amp; EXIT</string>
+    <string name="action_switch_screen_wl">Switch Screen WakeLock</string>
+    <string name="action_crash_that_trash">Debug: crash this trash!</string>
+    <string name="msg_screenwl_enabled">Screen WakeLock ENABLED!!! Your battery will die soon.</string>
+    <string name="msg_screenwl_disabled">Screen WakeLock Disabled. Your battery will live.</string>
+    <string name="msg_port_invalid">Port number is not a number. Edit settings and try again!</string>
+    <string name="notif_chan_main_name">Connection status</string>
+    <string name="notif_chan_failures_name">Connection failures</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_netlist">Network List</string>
+    <string name="menu_settings">Settings</string>
+
+    <string name="sets_hdg_tools">Tools</string>
+    <string name="sets_hdg_sfx">Sound Effects</string>
+    <string name="sets_hdg_sfx_debug">Sound Effects Options</string>
+    <string name="sets_hdg_auth">Authorizatrion</string>
+    <string name="sets_hdg_conn">Connection</string>
+    <string name="sets_hdg_acc">Account Info</string>
+    <string name="sets_hdg_ptt" translatable="false">PTT</string>
+
+    <string name="acc_def_host" translatable="false">127.0.0.1</string>
+    <string name="acc_def_email" translatable="false">test@localhost.local</string>
+    <string name="acc_def_passwd" translatable="false">admin123</string>
+    <string name="acc_def_raum" translatable="false">Test</string>
+    <string name="acc_def_callsign" translatable="false">T3ST</string>
+    <string name="acc_def_descr" translatable="false">Demo Station 1</string>
+    <string name="acc_def_country">Zimbabwe</string>
+    <string name="acc_def_city">Gluckenbourgh</string>
+    <string name="acc_def_ptt_timeout" translatable="false">0</string>
+    <string name="acc_ptt_timeout">PTT Timeout (0=inf)</string>
+    <string name="svc_not_title">FRN Client</string>
+    <string name="svc_not_text">Service started.</string>
+    <string name="sets_ptt_method">PTT Method</string>
+    <string name="acc_ptt_none">None</string>
+    <string name="acc_ptt_kup">Volume UP</string>
+    <string name="acc_ptt_kdn">Volume DOWN</string>
+    <string name="mnu_item_conn">Connection</string>
+    <string name="opt_hytera_mode">Hytera mode</string>
+    <string name="opt_hytera_mode_desc">Device-specific changes for Hytera PRC radios. P1=settings, P2=rooms</string>
+    <string name="opt_hytera_dbg_mode">Hytera debug mode</string>
+    <string name="opt_hytera_dbg_mode_desc">Shows toast messages with keycodes when you press hardware keys.</string>
+    <string name="opt_ptt_inhibit">PTT Disable</string>
+    <string name="opt_ptt_inhibit_desc">Protection against false PTT triggers in the pocket.</string>
+    <string name="opt_compressor">Compressor</string>
+    <string name="opt_compressor_desc">Puts sound from microphone trought sound compressor effect</string>
+    <string name="opt_lpf">High-pass filter</string>
+    <string name="opt_lpf_desc">High-pass filter to cut bass freqs</string>
+    <string name="opt_awakeness_mode">Screen Wake-lock</string>
+    <string name="opt_awakeness_mode_desc">Keeps the screen awake while app is running. DRAINS BATTERY IN SECONDS!</string>
+
+    <string name="opt_sfx_filter1_cutoff_title">First HPF cutoff freq</string>
+    <string name="opt_sfx_filter1_q_title">First HPF Q value</string>
+    <string name="opt_sfx_filter2_cutoff_title">Second HPF cutoff freq</string>
+    <string name="opt_sfx_filte_multiplier_title">Afterfilter Gain multiplier</string>
+
+    <string name="opt_compressor_mgain_title">Compressor Makeup Gain</string>
+    <string name="opt_compressor_treshold_title">Compressor Treshold, dB</string>
+    <string name="opt_compressor_ratio_title">Compressor Ratio</string>
+    <string name="opt_compressor_release_title">Compressor Release, seconds</string>
+
+
+    <string name="opt_sfx_filter1_cutoff_default" translatable="false">300</string>
+    <string name="opt_sfx_filter1_q_default" translatable="false">1.0</string>
+    <string name="opt_sfx_filter2_cutoff_default" translatable="false">1000</string>
+    <string name="opt_sfx_filte_multiplier_default" translatable="false">3.0</string>
+
+    <string name="opt_compressor_mgain_default" translatable="false">3.0</string>
+    <string name="opt_compressor_treshold_default" translatable="false">-12.0</string>
+    <string name="opt_compressor_ratio_default" translatable="false">0.25</string>
+    <string name="opt_compressor_release_default" translatable="false">0.1</string>
+
+    <string name="opt_sfx_fatality">Sound Effects Settings wrong. PSE reset to default!</string>
+
+
+    <string name="error_unauthorized">Authorization error. \nCheck your keys or grab a hammer.</string>
+    <string name="error_unknown">Unknown error. Try checking internet connection and ADB-LOGCAT.</string>
+    <string name="msg_raum_set">Room set. Reconnect, please.</string>
+    <string name="label_ptt" translatable="false">PTT</string>
+    <string name="label_connect">CONN</string>
+    <string name="label_disconnect">DISCON</string>
+    <string name="label_btn_save">Save</string>
+    <string name="label_btn_clear">Abort</string>
+    <string name="acra_sendmail_required">Would you like to send the error report to the developer\'s email?</string>
+    <string name="nda_trashcan_selferror">Cannot initialize NDK error reporter!</string>
+
+    <string name="flavor_main">Primary Edition</string>
+    <string name="flavor_histeria">HighTerra Edition</string>
+    <string name="flavor_audiophile">Audiophile Edition</string>
+    <!--<string name=""></string>-->
+</resources>

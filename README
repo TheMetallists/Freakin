@@ -1,0 +1,78 @@
+# Freakin'!
+
+Android FRN client for radio amateur repeater networks.
+
+This application allows users to connect to FRN networks/servers
+to transmit and receive in FRN-based hotspot/repeater networks.
+Contains an audiophile's kit (a.k.a compressor) for those who does not
+think that ham radios is as basic speech transmission method as it can get.
+
+WARNING: the FRN protocol IS NOT ENCRYPTED. This means that your password is transmitted in clear text.
+DO NOT connect to your FRN server using public wifi, or pirates will hold a burping/swearing contest all over it.
+
+
+Does the app require root permissions?
+    No. Why it should?
+Can it interact with other apps?
+    Not for now. Maybe some radio-related apps in future.
+How easy is it to use?
+    Requires basic amateur radio knowledge.
+
+=====================
+This program is redistributed under GNU GPL v3 and contains parts of other software under
+open source licenses.
+
+=====================
+WARNING. If you connect to actual repeater network you need a valid amateur radio.
+Check your country's laws, because some countries restrict remote operations of
+amateur radio.
+
+====================
+PERMISSIONS:
+This software uses following permissions:
+- record and play audio - to receive/transmit audio.
+- wakelock - to more efficiently drain your battery when you forgot to turn the app off (e.g. to work continuously)
+- internet - to leak your spots to wsprnet.org when you don't want to
+
+Most of this permissions are requested only when you turn features that require them in the settings, and should
+not be required for app to work without that features.
+
+
+===================
+CRASHES & BUGZ
+
+The app now has a error reporting library included. So you can send a bug report.
+There is also a native (C++) crash reporter that has no e-mail reporting, so files from
+/sdcard/Android/files/.../crashes (exact folder on your device may vary) has to be sent
+manually.
+
+==================
+CONTACT
+You can write to metallists ALFA_TANGO freemail DELTA_OSCAR_TANGO hu
+
+==================
+TRANSLATE
+If you want to translate this app to your language, you need to
+find a file called strings.xml in the project source code,
+open it in any text editor that supports UTF-8 and modify it
+while following XML markup language. If your language is weirder than
+mine, you need to provide additional details on what I should do with
+numerals etc. But it may take a long time to implement all this, so
+it's better if you prepare a separate file that will work somehow without
+modifying large portions of code.
+
+==================
+APPLE JAM
+There is NO Iphone(r)©(tm) version planned. I do not have any Apple inc.
+devices to code/test/debug on, I am unfamiliar with their systems.
+
+
+=================
+EMOTIONAL SUPPORT
+We, HAMs need more skilled coders. So, if you want to toss a coin, go and
+pay someone who will create and release a new cool opensource app like this one.
+(I mean REALLY cool, not another logbook).
+If you still want to donate, you have to do this in Bitcoin,
+since I prefer to remain anonymity:
+- 3LHpmYMo2Zo3RaZqTvHsT3isFJ5rvj4xWU or:
+- bc1qy633s5me0ytyalgl3ra8k2pgc4eaqcgcl3srwc

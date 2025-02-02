@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/sets_hdg_conn">
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/acc_def_host"
+            android:key="acc_server"
+            android:summary="Domain or IP"
+            android:title="Server" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="10024"
+            android:digits="0123456789"
+            android:inputType="numberDecimal"
+            android:key="acc_servport"
+            android:summary="number from 1 to 65535"
+            android:title="Port" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/sets_hdg_auth">
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/acc_def_email"
+            android:key="acc_email"
+            android:summary="Serves as Login"
+            android:title="E-Mail" />
+        <aq.metallists.freundschaft.ui.settings.PasswordboxPreference
+            android:defaultValue="@string/acc_def_passwd"
+            android:key="acc_pass"
+            android:summary="will be transmitted in clear"
+            android:title="Password" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/acc_def_raum"
+            android:key="acc_raum"
+            android:summary="Room name"
+            android:title="Room" />
+        <aq.metallists.freundschaft.ui.settings.ListboxPreference
+            android:defaultValue="2"
+            android:entries="@array/arr_charsets"
+            android:entryValues="@array/arr_charsets"
+            android:key="acc_conncharset"
+            android:title="Charset" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/sets_hdg_acc">
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/acc_def_callsign"
+            android:key="acc_callsign"
+            android:summary="Will not be transmitted, can be bogus."
+            android:title="Callsign" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/acc_def_descr"
+            android:key="acc_description"
+            android:title="Description" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/acc_def_country"
+            android:key="acc_country"
+            android:title="Country" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/acc_def_city"
+            android:key="acc_city"
+            android:title="City" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/sets_hdg_sfx">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="snd_effect_compressor"
+            android:summary="@string/opt_compressor"
+            android:title="@string/opt_compressor" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="snd_effect_lpf"
+            android:summary="@string/opt_lpf_desc"
+            android:title="@string/opt_lpf" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="sfx_debug"
+        android:title="@string/sets_hdg_sfx_debug">
+
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/opt_sfx_filter1_cutoff_default"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="opt_2_sfx_filter1_cutoff"
+            android:title="@string/opt_sfx_filter1_cutoff_title" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/opt_sfx_filter1_q_default"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="opt_2_sfx_filter1_q"
+            android:title="@string/opt_sfx_filter1_q_title" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/opt_sfx_filter2_cutoff_default"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="opt_2_sfx_filte2_cutoff"
+            android:title="@string/opt_sfx_filter2_cutoff_title" />
+
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/opt_sfx_filte_multiplier_default"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="opt_2_sfx_filte_multiplier"
+            android:title="@string/opt_sfx_filte_multiplier_title" />
+
+
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/opt_compressor_mgain_default"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="opt_2_compressor_mgain"
+            android:title="@string/opt_compressor_mgain_title" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/opt_compressor_treshold_default"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="opt_2_compressor_treshold"
+            android:title="@string/opt_compressor_treshold_title" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/opt_compressor_ratio_default"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="opt_2_compressor_ratio"
+            android:title="@string/opt_compressor_ratio_title" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/opt_compressor_release_default"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="opt_2_compressor_release"
+            android:title="@string/opt_compressor_release_title" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/sets_hdg_ptt">
+        <aq.metallists.freundschaft.ui.settings.ListboxPreference
+            android:defaultValue="1"
+            android:entries="@array/ptt_mode"
+            android:entryValues="@array/ptt_mode"
+            android:key="opt_ptt_mode"
+            android:title="@string/sets_ptt_method" />
+        <aq.metallists.freundschaft.ui.settings.TextboxPreference
+            android:defaultValue="@string/acc_def_ptt_timeout"
+            android:digits="0123456789"
+            android:inputType="numberDecimal"
+            android:key="opt_ptt_timeout"
+            android:title="@string/acc_ptt_timeout" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="opt_ptt_inhibit"
+            android:summary="@string/opt_ptt_inhibit_desc"
+            android:title="@string/opt_ptt_inhibit" />
+
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/sets_hdg_tools">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="opt_hytera_mode"
+            android:summary="@string/opt_hytera_mode_desc"
+            android:title="@string/opt_hytera_mode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="opt_hytera_kbddebug"
+            android:summary="@string/opt_hytera_dbg_mode_desc"
+            android:title="@string/opt_hytera_dbg_mode" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="opt_awakening"
+            android:summary="@string/opt_awakeness_mode_desc"
+            android:title="@string/opt_awakeness_mode" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
