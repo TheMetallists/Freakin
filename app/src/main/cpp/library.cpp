@@ -25,13 +25,10 @@ Java_aq_metallists_freundschaft_vocoder_GSMNativeVocoder_voc_1init(JNIEnv *env, 
 
 
     try {
-        __android_log_print(ANDROID_LOG_WARN, APPNAME,
-                            "VOCODER: ALLOCATE");
-        CerebralCortex *hCortex = (CerebralCortex *) malloc(sizeof(CerebralCortex));
-        //CerebralCortex *hCortex = new CerebralCortex(doCompressor, doLpf, env, glazz);
+        CerebralCortex *hCortex = new CerebralCortex(doCompressor, doLpf, env, glazz);
         new(hCortex) CerebralCortex(doCompressor, doLpf, env, glazz);
 
-        __android_log_print(ANDROID_LOG_WARN, APPNAME,
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,
                             "VOCODER NEW ADDRESS: %lld, pSIZE: %d",
                             (long long) hCortex, (int) sizeof(char *));
         env->SetLongField(glazz, fhVoc, (long long) hCortex);
@@ -63,7 +60,6 @@ Java_aq_metallists_freundschaft_vocoder_GSMNativeVocoder_voc_1destroy(JNIEnv *en
                         (long long) pVocoder);
 
     delete pVocoder;
-    free(pVocoder);
     env->SetLongField(glazz, fhVoc, (long long) -2);
     env->DeleteLocalRef(selfclass);
 }
@@ -356,13 +352,13 @@ char *CerebralCortex::decode(unsigned char *srcBuf, int srcLen, int *numPackets,
         memcpy(bitpakt, srcBuf + (65 * i), 65);
         int ret = gsm_decode(this->pVocoder, bitpakt, outbuf + (320 * i));
         if (ret < 0) {
-            throw std::invalid_argument("GSM CODEC RETURNED -1");
+            throw std::invalid_argument("GSM CODEC RETURNED -1 355");
         }
 
         // rv = rv || gsm_decode(handle, (gsm_byte *)(gsmData + 33), (gsm_signal *)(pcmData + 320));
         ret = ret || gsm_decode(this->pVocoder, bitpakt + 33, outbuf + (320 * i) + 160);
         if (ret < 0) {
-            throw std::invalid_argument("GSM CODEC RETURNED -1");
+            throw std::invalid_argument("GSM CODEC RETURNED -1 361");
         }
     }
 

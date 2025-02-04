@@ -311,7 +311,7 @@ public class FSClient {
             if (this.downlinkVocoder == null) {
                 this.downlinkVocoder = new GSMNativeVocoder(this.effectCompressor, this.effectLPF);
                 this.downlinkVocoder.connectXLRJack((SoundLevelReceiver) this.soundif);
-                Logger.getInstance().i("downlinkVocoder CREATED");
+                Logger.getInstance().v("downlinkVocoder CREATED");
                 //this.downlinkVocoder.doCompressor = this.effectCompressor;
             }
 
