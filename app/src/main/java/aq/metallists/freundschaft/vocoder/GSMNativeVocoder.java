@@ -1,6 +1,9 @@
 package aq.metallists.freundschaft.vocoder;
 
+import java.util.Locale;
+
 import aq.metallists.freundschaft.overridable.SoundLevelReceiver;
+import aq.metallists.freundschaft.tools.Logger;
 
 public class GSMNativeVocoder {
     static {
@@ -17,6 +20,7 @@ public class GSMNativeVocoder {
         this.doLpf = useLPF;
 
         this.voc_init();
+        Logger.getInstance().i(String.format(Locale.CANADA,"JVOCODER VERIFY: %s",Long.toString(this.hVoc)));
     }
 
     public void connectXLRJack(SoundLevelReceiver _xlr) {

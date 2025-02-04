@@ -1,6 +1,4 @@
 #include "aq_metallists_freundschaft_vocoder_GSMNativeVocoder.h"
-
-
 #include "library.h"
 
 
@@ -12,6 +10,7 @@ using namespace cycfi::q;
 #include <android/log.h>
 #include <cmath>
 #include <memory>
+#include <memory.h>
 
 #define APPNAME "libFreakin"
 
@@ -26,8 +25,15 @@ Java_aq_metallists_freundschaft_vocoder_GSMNativeVocoder_voc_1init(JNIEnv *env, 
 
 
     try {
-        CerebralCortex *hCortex = new CerebralCortex(doCompressor, doLpf, env, glazz);
+        __android_log_print(ANDROID_LOG_WARN, APPNAME,
+                            "VOCODER: ALLOCATE");
+        CerebralCortex *hCortex = (CerebralCortex *) malloc(sizeof(CerebralCortex));
+        //CerebralCortex *hCortex = new CerebralCortex(doCompressor, doLpf, env, glazz);
+        new(hCortex) CerebralCortex(doCompressor, doLpf, env, glazz);
 
+        __android_log_print(ANDROID_LOG_WARN, APPNAME,
+                            "VOCODER NEW ADDRESS: %lld, pSIZE: %d",
+                            (long long) hCortex, (int) sizeof(char *));
         env->SetLongField(glazz, fhVoc, (long long) hCortex);
     } catch (std::invalid_argument &x) {
         env->ThrowNew(env->FindClass("java/lang/Exception"), "ERROR CREATING JNI OBJECT!");
@@ -43,7 +49,7 @@ Java_aq_metallists_freundschaft_vocoder_GSMNativeVocoder_voc_1destroy(JNIEnv *en
     jfieldID fhVoc = env->GetFieldID(selfclass, "hVoc", "J");
     jlong ptr = env->GetLongField(glazz, fhVoc);
 
-    if (ptr < 1) {
+    if (ptr == 0) {
         __android_log_print(ANDROID_LOG_WARN, APPNAME,
                             "Vocoder attempt to destroy the universe!: %lld",
                             (long long) ptr);
@@ -57,7 +63,7 @@ Java_aq_metallists_freundschaft_vocoder_GSMNativeVocoder_voc_1destroy(JNIEnv *en
                         (long long) pVocoder);
 
     delete pVocoder;
-
+    free(pVocoder);
     env->SetLongField(glazz, fhVoc, (long long) -2);
     env->DeleteLocalRef(selfclass);
 }
@@ -79,15 +85,15 @@ Java_aq_metallists_freundschaft_vocoder_GSMNativeVocoder_voc_1encode(JNIEnv *env
     unsigned char *srcBuf = new unsigned char[srcLen];
     env->GetByteArrayRegion(inp, 0, srcLen, reinterpret_cast<jbyte *>(srcBuf));
 
-    if (ptr < 1) {
+    if (ptr == 0) {
         __android_log_print(ANDROID_LOG_WARN, APPNAME, "Vocoder null: %lld", (long long) ptr);
-        env->ThrowNew(env->FindClass("java/lang/Exception"), "VOCODER IS NULL!");
+        env->ThrowNew(env->FindClass("java/lang/Exception"), "VOCODER IS NULL (c1)!");
         return NULL;
     }
 
     auto pVocoder = (CerebralCortex *) ptr;
     if (pVocoder == NULL) {
-        env->ThrowNew(env->FindClass("java/lang/Exception"), "VOCODER IS NULL!");
+        env->ThrowNew(env->FindClass("java/lang/Exception"), "VOCODER IS NULL (c2)!");
         return NULL;
     }
     pVocoder->glazz = glazz;
@@ -132,7 +138,7 @@ Java_aq_metallists_freundschaft_vocoder_GSMNativeVocoder_voc_1decode(
     unsigned char *srcBuf = new unsigned char[srcLen];
     env->GetByteArrayRegion(inp, 0, srcLen, reinterpret_cast<jbyte *>(srcBuf));
 
-    if (ptr < 1) {
+    if (ptr == 0) {
         __android_log_print(ANDROID_LOG_WARN, APPNAME, "Vocoder null: %lld", (long long) ptr);
         env->ThrowNew(env->FindClass("java/lang/Exception"), "VOCODER IS NULL!");
         return NULL;
