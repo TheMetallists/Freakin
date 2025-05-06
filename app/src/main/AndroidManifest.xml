@@ -20,9 +20,8 @@
             android:name=".service.FreundschaftService"
             android:enabled="true"
             android:exported="false"
-            android:permission="TODO"
             android:foregroundServiceType="microphone"
-            />
+            android:permission="TODO" />
 
 
         <activity
@@ -35,6 +34,84 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name=".MainActivity$PttReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="10000">
+                <!-- Hytera PNC 370 SE -->
+                <action android:name="com.slacorp.eptt.android.PTT_PRESS" />
+                <action android:name="com.slacorp.eptt.android.PTT_RELEASE" />
+                <action android:name="com.slacorp.eptt.android.START_EMERGENCY_CALL" />
+                <action android:name="com.slacorp.eptt.android.CANCEL_EMERGENCY_CALL" />
+                <action android:name="com.meigsmart.meigkeyaccessibility.onkeyevent" />
+                <!--  ##########################################################################################################3  -->
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <!--  ##########################################################################################################3  -->
+                <action android:name="android.intent.action.PTT.down" />
+                <action android:name="android.intent.action.PTT.up" />
+                <action android:name="com.zed3.action.PTT_DOWN" />
+                <action android:name="com.zed3.action.PTT_UP" />
+                <action android:name="com.zed3.action.ACTION_SWITCH_PTT_GROUP" />
+                <action android:name="android.intent.action.PTT_BUTTON_DOWN" />
+                <action android:name="android.intent.action.PTT_BUTTON_UP" />
+                <action android:name="android.intent.action.PTT" />
+                <action android:name="android.intent.action.pttUp.down" />
+                <action android:name="android.intent.action.pttDown.down" />
+                <action android:name="android.intent.action.pocptt.down" />
+                <action android:name="android.intent.action.pocptt.up" />
+                <action android:name="com.android.action.START_PTT" />
+                <action android:name="android.intent.action.EXT_PTT.down" />
+                <action android:name="android.intent.action.EXT_PTT.up" />
+                <action android:name="unipro.hotkey.ptt.down" />
+                <action android:name="unipro.hotkey.ptt.up" />
+                <action android:name="com.cyrus.intent.action.PTT_BUTTON" />
+                <action android:name="com.talkpod.ptt.down" />
+                <action android:name="com.talkpod.ptt.up" />
+                <action android:name="com.corget.ptt.down" />
+                <action android:name="com.corget.ptt.up" />
+                <action android:name="com.android.action.ptt" />
+                <action android:name="com.magcomm.intent.action.PTT_KEY_DOWN" />
+                <action android:name="com.magcomm.intent.action.PTT_KEY_UP" />
+                <action android:name="android.action.PTT_PRESSED" />
+                <action android:name="android.action.PTT_RELEASED" />
+                <action android:name="com.android.cusKey.ptt.down" />
+                <action android:name="com.android.cusKey.ptt.up" />
+                <action android:name="com.ruggear.intent.action.PTT.CHANNEL.next" />
+                <action android:name="com.ruggear.intent.action.PTT.CHANNEL.prev" />
+                <action android:name="com.ruggear.intent.action.PTT.CHANNEL" />
+                <action android:name="com.ruggear.intent.action.PTT.USER" />
+                <action android:name="com.ecom.intent.action.PTT_BUTTON_DOWN" />
+                <action android:name="com.ecom.intent.action.PTT_BUTTON_UP" />
+                <action android:name="com.chivin.action.MEDIA_PTT_DOWN" />
+                <action android:name="com.chivin.action.MEDIA_PTT_UP" />
+                <action android:name="alk.hotkey.ptt.down" />
+                <action android:name="alk.hotkey.ptt.up" />
+                <action android:name="alk.hotkey.ear.ptt.down" />
+                <action android:name="alk.hotkey.ear.ptt.up" />
+                <action android:name="com.yl.ptt.keydown" />
+                <action android:name="com.yl.ptt.keyup" />
+                <action android:name="com.sdream.ls.PTT.down" />
+                <action android:name="com.sdream.ls.PTT.up" />
+                <action android:name="android.intent.action.PTT_DOWN" />
+                <action android:name="android.intent.action.PTT_UP" />
+                <action android:name="com.motorolasolutions.intent.action.ACTION_PTT_BUTTON_DOWN" />
+                <action android:name="com.motorolasolutions.intent.action.ACTION_PTT_BUTTON_UP" />
+                <action android:name="lolaage.ptt.down" />
+                <action android:name="lolaage.ptt.up" />
+                <action android:name="com.caltta.echat.hotkey.ptt.down" />
+                <action android:name="com.caltta.echat.hotkey.ptt.up" />
+                <action android:name="lte.trunk.action.KEYEVENT_PTT_DOWN" />
+                <action android:name="lte.trunk.action.KEYEVENT_PTT_UP" />
+                <action android:name="android.intent.action.WM_PTT_DN" />
+                <action android:name="android.intent.action.WM_PTT_UP" />
+                <action android:name="com.hebs.action.ACTION_START_PTT" />
+                <action android:name="com.hebs.action.ACTION_STOP_PTT" />
+                <action android:name="com.lynknex.intent.action.PTT_START" />
+                <action android:name="com.lynknex.intent.action.PTT_STOP" />
+                <!--  ##########################################################################################################3  -->
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

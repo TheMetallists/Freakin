@@ -16,17 +16,21 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
 import aq.metallists.freundschaft.FSRoomMember;
 import aq.metallists.freundschaft.R;
 import aq.metallists.freundschaft.overridable.FSClientAdapter;
+import aq.metallists.freundschaft.service.events.PAbortRequestMessage;
+import aq.metallists.freundschaft.service.events.PNetListMessage;
+import aq.metallists.freundschaft.service.events.PRequestDataUpdate;
 
 public class NetlistFragment extends Fragment {
     private NetlistAdapter nlAdapter;
-    private BroadcastReceiver bres;
     private ListView chatroomList;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -47,29 +51,18 @@ public class NetlistFragment extends Fragment {
             }
         });
 
-        // networks_list
-        this.bres = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("aq.metallists.netlist")) {
-                    Bundle bundle = intent.getExtras();
-                    if (bundle != null) {
-                        ArrayList<String> dataList = (ArrayList<String>) bundle.getSerializable("newNetList");
-                        nlAdapter.clear();
-                        for (String fsr : dataList) {
-                            nlAdapter.add(fsr);
-                        }
-
-                        nlAdapter.notifyDataSetChanged();
-                    }
-
-                }
-
-            }
-        };
-
 
         return root;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNetlistEvent(PNetListMessage event) {
+        nlAdapter.clear();
+        for (String fsr : event.netList) {
+            nlAdapter.add(fsr);
+        }
+
+        nlAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -82,26 +75,15 @@ public class NetlistFragment extends Fragment {
 
         Activity act = getActivity();
         if (act != null) {
-            IntentFilter iff = new IntentFilter();
-            iff.addAction("aq.metallists.netlist");
-
-            LocalBroadcastManager
-                    .getInstance(getActivity().getApplicationContext())
-                    .registerReceiver(this.bres, iff);
-
-            LocalBroadcastManager
-                    .getInstance(act.getApplicationContext())
-                    .sendBroadcast(new Intent("aq.metallists.request_data_update"));
-
+            EventBus.getDefault().register(this);
+            EventBus.getDefault().post(new PRequestDataUpdate());
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        LocalBroadcastManager
-                .getInstance(getActivity().getApplicationContext())
-                .unregisterReceiver(this.bres);
+        EventBus.getDefault().unregister(this);
     }
 
 }

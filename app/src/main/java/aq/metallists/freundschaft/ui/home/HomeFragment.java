@@ -21,7 +21,10 @@ import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
@@ -29,13 +32,21 @@ import aq.metallists.freundschaft.FSRoomMember;
 import aq.metallists.freundschaft.R;
 import aq.metallists.freundschaft.overridable.FSClientAdapter;
 import aq.metallists.freundschaft.service.FreundschaftService;
+import aq.metallists.freundschaft.service.events.PAbortRequestMessage;
+import aq.metallists.freundschaft.service.events.PAudioLevelMSG;
+import aq.metallists.freundschaft.service.events.PConnectedMessage;
+import aq.metallists.freundschaft.service.events.PConnectingMessage;
+import aq.metallists.freundschaft.service.events.PFailureMessage;
+import aq.metallists.freundschaft.service.events.PRequestDataUpdate;
+import aq.metallists.freundschaft.service.events.PTTMessage;
+import aq.metallists.freundschaft.service.events.PUserListMessage;
 
 public class HomeFragment extends Fragment {
     private ToggleButton tbt;
     private FSClientAdapter userAdapter;
-    private BroadcastReceiver bres;
     private Button btnConn;
     private ProgressBar lvlBar;
+    private int ictr;
 
     public View onCreateView(
             @NonNull LayoutInflater inflater,
@@ -58,7 +69,7 @@ public class HomeFragment extends Fragment {
                     return;
                 }
                 if (isMyServiceRunning(FreundschaftService.class)) {
-                    LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).sendBroadcast(new Intent("aq.metallists.mission_abort"));
+                    EventBus.getDefault().post(new PAbortRequestMessage());
                     act.stopService(new Intent(act, FreundschaftService.class));
                 } else {
                     act.startService(new Intent(act, FreundschaftService.class));
@@ -77,75 +88,76 @@ public class HomeFragment extends Fragment {
         tbt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Intent intent = new Intent("aq.metallists.ptt");
-
                 if (b) {
                     tbt.setBackgroundColor(Color.parseColor("#FF0000"));
                 } else {
                     tbt.setBackgroundColor(Color.parseColor("#00FF00"));
                 }
-
-
-                // You can also include some extra data.
-                intent.putExtra("newptt", b);
-                Activity pac = getActivity();
-                if (pac == null) {
-                    return;
+                synchronized (HomeFragment.this) {
+                    if (ictr > 0) {
+                        ictr--;
+                        return;
+                    }
                 }
-                LocalBroadcastManager.getInstance(pac.getApplicationContext()).sendBroadcast(intent);
+
+                EventBus.getDefault().post(new PTTMessage(b));
             }
         });
 
-        this.bres = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("aq.metallists.ptt_external")) {
-                    boolean newPttx = intent.getBooleanExtra("new_ptt", false);
-                    if (tbt.isChecked() != newPttx) {
-                        tbt.setChecked(newPttx);
-                    }
-                } else if (intent.getAction().equals("aq.metallists.userlist")) {
-                    Bundle bundle = intent.getExtras();
-                    if (bundle != null) {
-                        ArrayList<FSRoomMember> dataList = (ArrayList<FSRoomMember>) bundle.getSerializable("newUserList");
-                        userAdapter.clear();
-                        for (FSRoomMember fsr : dataList) {
-                            userAdapter.add(fsr);
-                        }
-
-                        userAdapter.notifyDataSetChanged();
-                    }
-
-                } else if (intent.getAction().equals("aq.metallists.connected")) {
-                    boolean newConnected = intent.getBooleanExtra("newconnected", false);
-                    if (newConnected) {
-                        btnConn.setText(R.string.label_disconnect);
-                    } else {
-                        btnConn.setText(R.string.label_connect);
-                    }
-                } else if (intent.getAction().equals("aq.metallists.connecting")) {
-                    boolean newConnecting = intent.getBooleanExtra("newconnecting", false);
-                    if (newConnecting) {
-                        lvlBar.setIndeterminate(true);
-                    } else {
-                        lvlBar.setIndeterminate(false);
-                        lvlBar.setProgress(0);
-                    }
-                } else if (intent.getAction().equals("aq.metallists.error.commonfailure")) {
-                    lvlBar.setIndeterminate(false);
-                    lvlBar.setProgress(0);
-                } else if (intent.getAction().equals("aq.metallists.newAudioLevel")) {
-                    short level = intent.getShortExtra("level", (short) 0);
-                    lvlBar.setIndeterminate(false);
-                    lvlBar.setMax(Short.MAX_VALUE);
-                    lvlBar.setProgress((int) level);
-                }
-
-            }
-        };
 
 
         return root;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPAudioLevelMSG(PAudioLevelMSG event){
+        lvlBar.setIndeterminate(false);
+        lvlBar.setMax(Short.MAX_VALUE);
+        lvlBar.setProgress((int) event.level);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onErrorEvent(PFailureMessage event) {
+        lvlBar.setIndeterminate(false);
+        lvlBar.setProgress(0);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPTTMEvent(PTTMessage event) {
+        if (tbt.isChecked() != event.isKeyedDown) {
+            synchronized (this) {
+                ictr++;
+            }
+            tbt.setChecked(event.isKeyedDown);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUserListEvent(PUserListMessage event) {
+        userAdapter.clear();
+        for (FSRoomMember fsr : event.items) {
+            userAdapter.add(fsr);
+        }
+        userAdapter.notifyDataSetChanged();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onConnectedEvent(PConnectedMessage event) {
+        if (event.isConnected) {
+            btnConn.setText(R.string.label_disconnect);
+        } else {
+            btnConn.setText(R.string.label_connect);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onConnectingEvent(PConnectingMessage event) {
+        if (event.isConnecting) {
+            lvlBar.setIndeterminate(true);
+        } else {
+            lvlBar.setIndeterminate(false);
+            lvlBar.setProgress(0);
+        }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -167,33 +179,13 @@ public class HomeFragment extends Fragment {
         super.onResume();
 
         btnConn.requestFocus();
-
-        Activity act = getActivity();
-        if (act != null) {
-            IntentFilter iff = new IntentFilter();
-            iff.addAction("aq.metallists.ptt_external");
-            iff.addAction("aq.metallists.userlist");
-            iff.addAction("aq.metallists.connected");
-            iff.addAction("aq.metallists.connecting");
-            iff.addAction("aq.metallists.newAudioLevel");
-            iff.addAction("aq.metallists.error.commonfailure");
-
-            LocalBroadcastManager
-                    .getInstance(getActivity().getApplicationContext())
-                    .registerReceiver(this.bres, iff);
-
-            LocalBroadcastManager
-                    .getInstance(act.getApplicationContext())
-                    .sendBroadcast(new Intent("aq.metallists.request_data_update"));
-
-        }
+        EventBus.getDefault().register(this);
+        EventBus.getDefault().post(new PRequestDataUpdate());
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        LocalBroadcastManager
-                .getInstance(getActivity().getApplicationContext())
-                .unregisterReceiver(this.bres);
+        EventBus.getDefault().unregister(this);;
     }
 }

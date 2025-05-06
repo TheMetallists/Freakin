@@ -10,8 +10,8 @@ android {
         applicationId "aq.metallists.freundschaft"
         minSdkVersion 16
         targetSdk 34
-        versionCode 12
-        versionName "1.2"
+        versionCode 16
+        versionName "0.3.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -23,7 +23,7 @@ android {
     productFlavors {
         vPrimary {
             dimension "variances"
-            versionNameSuffix "-demo"
+            versionNameSuffix "-primary"
         }
         vHighterra {
             dimension "variances"
@@ -39,6 +39,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
@@ -58,6 +59,7 @@ android {
 
 dependencies {
 
+    implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -65,7 +67,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.5.2'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation 'androidx.preference:preference:1.2.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

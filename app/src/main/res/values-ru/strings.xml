@@ -12,11 +12,12 @@
     <string name="msg_screenwl_disabled">WakeLock экрана Выключен. Аккумулятора хватит на дольше.</string>
     <string name="msg_port_invalid">Номер порта - не число. Отредактируйте настройки и попробуйте снова.</string>
     <string name="notif_chan_failures_name">Ошибки подключения</string>
-    <string name="menu_home">Главное</string>
+    <string name="menu_home">Главная</string>
     <string name="menu_netlist">Список сетей</string>
     <string name="menu_settings">Настройки</string>
+    <string name="menu_about">О программе</string>
     <string name="sets_hdg_tools">Примочки</string>
-    <string name="sets_hdg_sfx">Звуковый эффекты</string>
+    <string name="sets_hdg_sfx">Звуковые эффекты</string>
     <string name="sets_hdg_sfx_debug">Расширенные звуковые эффекты</string>
     <string name="sets_hdg_auth">Авторизация</string>
     <string name="sets_hdg_conn">Соединение</string>
@@ -32,7 +33,7 @@
     <string name="acc_ptt_kdn">Качелька громкости ВНИЗ</string>
     <string name="mnu_item_conn">Соединение</string>
     <string name="opt_hytera_mode">Режим Хайтеры</string>
-    <string name="opt_hytera_mode_desc">Поддержка PRC терминалов Hytera. P1=настройки, P2=rjvyfns</string>
+    <string name="opt_hytera_mode_desc">Поддержка PRC терминалов Hytera. P1=настройки, P2=комнаты</string>
     <string name="opt_hytera_dbg_mode_desc">Показывает всплывающие сообщения с кодами клавиш</string>
     <string name="opt_ptt_inhibit">Запретить передачу</string>
     <string name="opt_ptt_inhibit_desc">Защита от детей, чайников и случайных нажатий в кармане.</string>
@@ -56,8 +57,8 @@
     <string name="msg_raum_set">Комната выбрана. Пожалуйста, переподключитесь.</string>
     <string name="label_connect">ПОДКЛ</string>
     <string name="label_disconnect">ОТКЛ</string>
-    <string name="label_btn_save">Сохранить</string>
-    <string name="label_btn_clear">Отмена</string>
+    <string name="label_btn_save">OK</string>
+    <string name="label_btn_clear">ОТМ</string>
     <string name="acra_sendmail_required">Хотите послать разработчику отчёт об ошибке?</string>
     <string name="nda_trashcan_selferror">Не могу инициализировать отлов ошибок NDK!</string>
     <string name="flavor_main">Версия: Стандарт</string>
@@ -65,4 +66,5 @@
     <string name="flavor_audiophile">Версия: Аудиофильская</string>
     <string name="opt_hytera_dbg_mode">Режим отладки Хайтеры</string>
     <string name="notif_chan_main_name">Статус подключения</string>
+    <string name="vreport_loading">Загрузка…</string>
 </resources>

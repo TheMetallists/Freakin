@@ -22,4 +22,10 @@
         android:name="aq.metallists.freundschaft.ui.settings.SettingsPage"
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="aq.metallists.freundschaft.ui.about.AboutFragment"
+        android:label="@string/menu_about"
+        tools:layout="@layout/fragment_about" />
 </navigation>

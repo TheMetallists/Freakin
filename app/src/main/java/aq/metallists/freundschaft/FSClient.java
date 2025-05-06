@@ -2,12 +2,9 @@ package aq.metallists.freundschaft;
 
 //import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
-import android.util.Log;
-
 import aq.metallists.freundschaft.overridable.FSSoundInterface;
 import aq.metallists.freundschaft.overridable.FSUnauthorizedError;
 import aq.metallists.freundschaft.overridable.FSUser;
-import aq.metallists.freundschaft.overridable.SoundLevelReceiver;
 import aq.metallists.freundschaft.tools.Logger;
 import aq.metallists.freundschaft.vocoder.GSMNativeVocoder;
 
@@ -75,11 +72,10 @@ public class FSClient {
         pak.addElement("ON", this.usr.getCallsign());
         pak.addElement("CL", "2");
         pak.addElement("BC", "PC Only");
-        pak.addElement("DS", this.usr.getDecaription());
+        pak.addElement("DS", this.usr.getDescription());
         pak.addElement("NN", this.usr.getCountry());
-        pak.addElement("CT", this.usr.getCity());
+        pak.addElement("CT", this.usr.getCity() + " - -");
         pak.addElement("NT", this._room);
-
         this.svr.sendBytePacket(pak.getPacked().getBytes("WINDOWS-1251"));
 
         Logger.getInstance().v("RESP:");
@@ -246,10 +242,10 @@ public class FSClient {
 
         if (this.downlinkVocoder == null) {
             this.downlinkVocoder = new GSMNativeVocoder(this.effectCompressor, this.effectLPF);
-            this.downlinkVocoder.connectXLRJack((SoundLevelReceiver) this.soundif);
+            this.downlinkVocoder.connectXLRJack(this.soundif);
             Logger.getInstance().i("downlinkVocoder CREATED");
             if (this.soundif != null) {
-                this.soundif.setVox(true);
+                this.soundif.setInboundXmission(true);
             }
         }
 
@@ -305,12 +301,16 @@ public class FSClient {
             int recordCnt = this.soundif.recordVoicePacket(soundPacket);
             Logger.getInstance().v(String.format(Locale.CANADA, "RECORDING: %d", System.currentTimeMillis() - time_a1));
             if (recordCnt != 3200) {
-                throw new Exception("TX MISALLIGNED!");
+                soundPacket = null;
+                soundPacket = new byte[3200];
+                recordCnt = this.soundif.recordVoicePacket(soundPacket);
+                if (recordCnt != 3200)
+                    throw new Exception("TX MISALLIGNED 2!");
             }
 
             if (this.downlinkVocoder == null) {
                 this.downlinkVocoder = new GSMNativeVocoder(this.effectCompressor, this.effectLPF);
-                this.downlinkVocoder.connectXLRJack((SoundLevelReceiver) this.soundif);
+                this.downlinkVocoder.connectXLRJack(this.soundif);
                 Logger.getInstance().v("downlinkVocoder CREATED");
                 //this.downlinkVocoder.doCompressor = this.effectCompressor;
             }
@@ -370,7 +370,7 @@ public class FSClient {
             Logger.getInstance().i("downlinkVocoder destroyed");
             this.downlinkVocoder = null;
             if (this.soundif != null) {
-                this.soundif.setVox(false);
+                this.soundif.setInboundXmission(false);
 
                 this.silenceAllSpeakers();
                 this.soundif.setClientList(this.onlineUsers);
@@ -490,6 +490,9 @@ public class FSClient {
 
             // klar the UI from active users
             this.soundif.setClientList(new FSRoomMember[]{});
+            this.soundif.setPtt(false);
+            this.soundif.abort();
+            this.soundif = null;
             this.join();
         } catch (Exception x) {
             x.printStackTrace();

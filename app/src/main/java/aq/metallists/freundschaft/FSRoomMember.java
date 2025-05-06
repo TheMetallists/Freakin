@@ -48,10 +48,17 @@ public class FSRoomMember {
             preCallsign = preCallsign.split(", ")[0];
         }
 
-        this.callsign = preCallsign;
-        this.callsignSupplement = preCallsign + ", " + frd.getBC() + ", " + frd.getDS();
+        String city = frd.getNN();
+        String cityPart = frd.getCT();
+        if (cityPart.split(" - ").length > 1) {
+            city = cityPart.split(" - ")[0];
+            cityPart = cityPart.split(" - ")[1];
+        }
 
-        this.comment = frd.getCT();
+        this.callsign = preCallsign;
+        this.callsignSupplement = preCallsign + ", " + frd.getBC() + ", " + city;
+
+        this.comment = frd.getDS() + ", " + cityPart + ", " + frd.getNN();
 
         clientTypeStr = frd.getBC();
 
@@ -129,8 +136,8 @@ public class FSRoomMember {
         }
 
         @NotNull
-        private String getCN() {
-            String r = doc.getElementsByTagName("CN").item(0).getTextContent();
+        private String getNN() {
+            String r = doc.getElementsByTagName("NN").item(0).getTextContent();
             if (r != null)
                 return r;
             else

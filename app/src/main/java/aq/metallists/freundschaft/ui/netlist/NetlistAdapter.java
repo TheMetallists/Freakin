@@ -17,7 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -25,6 +26,7 @@ import aq.metallists.freundschaft.FSClient;
 import aq.metallists.freundschaft.FSRoomMember;
 import aq.metallists.freundschaft.R;
 import aq.metallists.freundschaft.service.FreundschaftService;
+import aq.metallists.freundschaft.service.events.PAbortRequestMessage;
 
 public class NetlistAdapter extends ArrayAdapter<String> {
     final int INVALID_ID = -1;
@@ -63,7 +65,7 @@ public class NetlistAdapter extends ArrayAdapter<String> {
             @Override
             public void onClick(View view) {
                 if (isMyServiceRunning(FreundschaftService.class)) {
-                    LocalBroadcastManager.getInstance(ctx).sendBroadcast(new Intent("aq.metallists.mission_abort"));
+                    EventBus.getDefault().post(new PAbortRequestMessage());
                     ctx.stopService(new Intent(ctx, FreundschaftService.class));
                 }
 

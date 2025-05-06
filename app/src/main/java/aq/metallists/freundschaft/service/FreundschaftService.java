@@ -1,21 +1,20 @@
 package aq.metallists.freundschaft.service;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 
 import androidx.preference.PreferenceManager;
@@ -24,7 +23,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 
@@ -35,8 +37,18 @@ import aq.metallists.freundschaft.MainActivity;
 import aq.metallists.freundschaft.R;
 import aq.metallists.freundschaft.overridable.FSAndroidUser;
 import aq.metallists.freundschaft.overridable.FSUnauthorizedError;
-import aq.metallists.freundschaft.overridable.FSVedroidSoundInterface;
+import aq.metallists.freundschaft.overridable.FSSoundInterface;
+import aq.metallists.freundschaft.overridable.devices.GenericDevice;
+import aq.metallists.freundschaft.overridable.devices.GenericDeviceDetector;
+import aq.metallists.freundschaft.service.events.PAbortRequestMessage;
+import aq.metallists.freundschaft.service.events.PConnectingMessage;
+import aq.metallists.freundschaft.service.events.PFailureMessage;
+import aq.metallists.freundschaft.service.events.PRequestDataUpdate;
+import aq.metallists.freundschaft.service.events.PTTMessage;
+import aq.metallists.freundschaft.service.events.PInboundXmissionMSG;
+import aq.metallists.freundschaft.tools.LedConsts;
 import aq.metallists.freundschaft.tools.Logger;
+import aq.metallists.freundschaft.tools.NetworkTool;
 import aq.metallists.freundschaft.vocoder.GSMVocoderOptions;
 
 public class FreundschaftService extends Service {
@@ -54,13 +66,34 @@ public class FreundschaftService extends Service {
     Notification ncc;
     FSAndroidUser usr;
     FSClient fsc;
-    LocalBroadcastManager lbm;
-    BroadcastReceiver brs;
     SharedPreferences pfm;
 
     PowerManager.WakeLock wake;
     WifiManager.WifiLock mWifiLock = null;
     private boolean pttInhibit;
+    private boolean bPttStatus;
+
+    private GenericDevice myDev;
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void shutUpLogging(PConnectingMessage event) {
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onPTTMEvent(PTTMessage event) {
+        // TODO: add "is connected" check
+        if (event.isKeyedDown == bPttStatus) {
+            return;
+        }
+        bPttStatus = event.isKeyedDown;
+        setPtt(event.isKeyedDown);
+
+        if (event.isKeyedDown) {
+            setRxTxStatus(LedConsts.LED_TX);
+        } else {
+            setRxTxStatus(LedConsts.LED_OFF);
+        }
+    }
 
     private void setPtt(boolean ptt) {
         if (pttInhibit && ptt)
@@ -95,10 +128,69 @@ public class FreundschaftService extends Service {
 
     }
 
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onErrorEvent(PFailureMessage event) {
+        if (event.bIsAuthorizationError) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), R.string.error_unauthorized, Toast.LENGTH_LONG).show();
+                }
+            });
+
+            stopSelf();
+        }
+        if (event.bIsExtraError) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), R.string.error_unknown, Toast.LENGTH_LONG).show();
+                }
+            });
+
+            if (fsc != null) {
+                fsc.abort();
+                fsc = null;
+            }
+            stopSelf();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onRDUEvent(PRequestDataUpdate event) {
+        if (fsc != null)
+            fsc.requestDataUpdate();
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onInboundXMission(PInboundXmissionMSG event) {
+        if (event.isVoxActive) {
+            setRxTxStatus(LedConsts.LED_RX);
+        } else {
+            setRxTxStatus(LedConsts.LED_OFF);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onAbortRequest(PAbortRequestMessage event) {
+        if (fsc != null) {
+            fsc.abort();
+            fsc = null;
+        }
+        if (wake != null) {
+            try {
+                wake.release();
+            } catch (Exception x) {
+            }
+        }
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Intent pit = new Intent(this, MainActivity.class);
         PendingIntent pid = PendingIntent.getActivity(this, 0, pit, PendingIntent.FLAG_MUTABLE);
+
+        myDev = GenericDeviceDetector.getDevice(getApplicationContext());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             this.startMyOwnForeground();
@@ -115,82 +207,7 @@ public class FreundschaftService extends Service {
             startForeground(2, this.ncc);
         }
 
-
-        this.lbm = LocalBroadcastManager.getInstance(getApplicationContext());
-
-        IntentFilter intFilter = new IntentFilter();
-        intFilter.addAction("aq.metallists.ptt");
-        intFilter.addAction("aq.metallists.vox");
-        intFilter.addAction("aq.metallists.mission_abort");
-        intFilter.addAction("aq.metallists.error.unauthorized");
-        intFilter.addAction("aq.metallists.error.extra");
-        intFilter.addAction("aq.metallists.request_data_update");
-
-        this.brs = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                switch (intent.getAction()) {
-                    case "aq.metallists.ptt": {
-                        boolean pttStatus = intent.getBooleanExtra("newptt", false);
-                        setPtt(pttStatus);
-
-                        if (pttStatus) {
-                            setRxTxStatus(1);
-                        } else {
-                            setRxTxStatus(0);
-                        }
-
-                        break;
-                    }
-                    case "aq.metallists.vox": {
-                        boolean pttStatus = intent.getBooleanExtra("newvox", false);
-
-                        if (pttStatus) {
-                            setRxTxStatus(-1);
-                        } else {
-                            setRxTxStatus(0);
-                        }
-                        break;
-                    }
-                    case "aq.metallists.mission_abort": {
-                        if (fsc != null) {
-                            fsc.abort();
-                            fsc = null;
-                        }
-                        if (wake != null) {
-                            try {
-                                wake.release();
-                            } catch (Exception x) {
-                            }
-                        }
-                        break;
-                    }
-                    case "aq.metallists.error.unauthorized": {
-                        Toast.makeText(getApplicationContext(), R.string.error_unauthorized, Toast.LENGTH_LONG).show();
-                        stopSelf();
-                        break;
-                    }
-                    case "aq.metallists.error.extra": {
-
-
-                        Toast.makeText(getApplicationContext(), R.string.error_unknown, Toast.LENGTH_LONG).show();
-                        if (fsc != null) {
-                            fsc.abort();
-                            fsc = null;
-                        }
-                        stopSelf();
-                        break;
-                    }
-                    case "aq.metallists.request_data_update": {
-                        if (fsc != null)
-                            fsc.requestDataUpdate();
-                    }
-                }
-
-            }
-        };
-        this.lbm.registerReceiver(this.brs, intFilter);
-
+        EventBus.getDefault().register(this);
 
         pfm = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -212,8 +229,10 @@ public class FreundschaftService extends Service {
             Toast.makeText(getApplicationContext(), R.string.msg_port_invalid, Toast.LENGTH_LONG).show();
             stopSelf();
         }
+
+
         fsc = FSClient.createForUser(usr,
-                pfm.getString("acc_server", getString(R.string.acc_def_host)),
+                NetworkTool.getBestServer(pfm.getString("acc_server", getString(R.string.acc_def_host)), port),
                 port,
                 pfm.getString("acc_raum", getString(R.string.acc_def_raum))
         );
@@ -222,7 +241,7 @@ public class FreundschaftService extends Service {
         pttInhibit = pfm.getBoolean("opt_ptt_inhibit", false);
 
         try {
-            FSVedroidSoundInterface fsi = new FSVedroidSoundInterface(getApplicationContext());
+            FSSoundInterface fsi = new FSSoundInterface(getApplicationContext());
             fsc.setSoundInterface(fsi);
 
             new Thread(new Runnable() {
@@ -233,19 +252,20 @@ public class FreundschaftService extends Service {
                         Logger.getInstance().e("EPL!!!");
                         fsc.enterProtocolLoop();
                     } catch (FSUnauthorizedError c) {
-                        lbm.sendBroadcast(new Intent("aq.metallists.error.unauthorized"));
-                        lbm.sendBroadcast(new Intent("aq.metallists.error.commonfailure"));
+                        onErrorEvent(new PFailureMessage(false, true));
+
                     } catch (IOException x) {
-                        lbm.sendBroadcast(new Intent("aq.metallists.error.extra"));
-                        lbm.sendBroadcast(new Intent("aq.metallists.error.commonfailure"));
+                        onErrorEvent(new PFailureMessage(true, false));
                         //Toast.makeText(getApplicationContext(), "EXCEPTION WHILE CONNECTING 1!", Toast.LENGTH_LONG).show();
                         x.printStackTrace();
-                        fsc.abort();
-                        fsc = null;
-                        stopSelf();
+                        if (fsc != null) {
+                            fsc.abort();
+                            fsc = null;
+                            stopSelf();
+                        }
                     } catch (ParserConfigurationException e) {
                         e.printStackTrace();
-                        lbm.sendBroadcast(new Intent("aq.metallists.error.commonfailure"));
+                        onErrorEvent(new PFailureMessage(false, false));
                     }
                 }
             }).start();
@@ -273,24 +293,38 @@ public class FreundschaftService extends Service {
         Intent ni = new Intent(this, MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this, 0, ni, PendingIntent.FLAG_MUTABLE);
 
+        int color = Color.BLUE;
+        int onMS = 200;
+        int offMS = 10000;
         int icn = R.drawable.ic_freakin_tray;
-        if (mode == 1) {
+        if (mode == LedConsts.LED_TX) {
             icn = R.drawable.ic_freakin_tray_tx;
-        } else if (mode == -1) {
+            color = Color.RED;
+            onMS = 15000;
+            offMS = 10;
+        } else if (mode == LedConsts.LED_RX) {
             icn = R.drawable.ic_freakin_tray_rx;
+            color = Color.GREEN;
+            onMS = 15000;
+            offMS = 10;
         }
 
-        Notification nt = new NotificationCompat.Builder(this, NOT_CHANNEL)
-                .setContentTitle(getText(R.string.svc_not_title))
-                //.setContentText(status)
-                .setSmallIcon(icn)
-                //.setLights(Color.RED, 500, 500)
-                .setContentIntent(pi)
-                .build();
+        if (myDev != null && myDev.isCustomLed()) {
+            myDev.setPttLed(mode);
+        } else {
+            Notification nt = new NotificationCompat.Builder(this, NOT_CHANNEL)
+                    .setContentTitle(getText(R.string.svc_not_title))
+                    //.setContentText(status)
+                    .setSmallIcon(icn)
+                    .setLights(color, onMS, offMS)
+                    .setContentIntent(pi)
+                    .build();
+
+            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            nm.notify(2, nt);
+        }
 
 
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(2, nt);
     }
 
     @Override
@@ -311,9 +345,7 @@ public class FreundschaftService extends Service {
         } catch (Exception x) {
         }
 
-        if (this.lbm != null) {
-            this.lbm.unregisterReceiver(this.brs);
-        }
+        EventBus.getDefault().unregister(this);
 
         return super.stopService(name);
     }

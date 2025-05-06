@@ -1,20 +1,32 @@
 package aq.metallists.freundschaft;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
 import android.graphics.Color;
+import android.hardware.lights.LightsManager;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.navigation.NavDestination;
 import androidx.preference.PreferenceManager;
 
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -30,7 +42,6 @@ import com.google.android.material.navigation.NavigationView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -39,9 +50,19 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.Locale;
 
 import aq.metallists.freundschaft.overridable.RadioFlavorModule;
+import aq.metallists.freundschaft.overridable.devices.GenericDevice;
+import aq.metallists.freundschaft.overridable.devices.GenericDeviceDetector;
+import aq.metallists.freundschaft.overridable.devices.HyteraPNC370Device;
+import aq.metallists.freundschaft.overridable.devices.HyteraPNC370SEDevice;
+import aq.metallists.freundschaft.overridable.devices.TeloTE590Device;
+import aq.metallists.freundschaft.service.events.PRequestDataUpdate;
+import aq.metallists.freundschaft.tools.DeviceZooHelper;
+import aq.metallists.freundschaft.tools.Logger;
 import aq.metallists.freundschaft.vocoder.GSMNativeVocoder;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -49,10 +70,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
 
-    private boolean pttUseVD = false;
-    private boolean pttUseVU = false;
-    private boolean pttHyteraMode = false;
+
     private boolean pttHyteraDebug = false;
+    private static GenericDevice pttDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_channellist, R.id.nav_settings)
+                R.id.nav_home, R.id.nav_channellist, R.id.nav_settings, R.id.nav_about)
                 .setDrawerLayout(drawer)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -85,20 +105,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 }
 
                 if (RadioFlavorModule.isHighTerra()) {
-                    if (flavor.length() > 0) {
+                    if (!flavor.isEmpty()) {
                         flavor += ", ";
                     }
                     flavor += getString(R.string.flavor_histeria);
                 }
 
-                if (flavor.length() < 1) {
+                if (flavor.isEmpty()) {
                     flavor = getString(R.string.flavor_main);
                 }
+
+                flavor = String.format(Locale.CANADA, "%s [%s]", flavor, DeviceZooHelper.getDeviceDesignator());
 
                 flavorHdg.setText(flavor);
             }
         }
 
+        pttDevice = GenericDeviceDetector.getDevice(getBaseContext());
 
         // check the C part, crash if failed to run
         GSMNativeVocoder.checkIfAlive();
@@ -112,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
         }
         doCreateNotificationChannels();
+
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 startActivity(
@@ -168,19 +192,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public void setupExternalPtt() {
         // external ptt settings
-        String pttMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("opt_ptt_mode", getString(R.string.acc_ptt_none));
-        if (pttMode.equals(getString(R.string.acc_ptt_kup))) {
-            this.pttUseVU = true;
-        } else if (pttMode.equals(getString(R.string.acc_ptt_kdn))) {
-            this.pttUseVD = true;
-        } else {
-            this.pttUseVU = false;
-            this.pttUseVD = false;
-        }
-
-        this.pttHyteraMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("opt_hytera_mode", true);
+        boolean pttHyteraMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("opt_hytera_mode", true);
         if (RadioFlavorModule.isHighTerra()) {
-            this.pttHyteraMode = true;
+            pttHyteraMode = true;
         }
 
         this.pttHyteraDebug = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("opt_hytera_kbddebug", false);
@@ -195,26 +209,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((this.pttUseVU && keyCode == KeyEvent.KEYCODE_VOLUME_UP) ||
-                (this.pttUseVD && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
-            Intent intent = new Intent("aq.metallists.ptt_external");
-            intent.putExtra("new_ptt", true);
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-            return true;
-        }
+        pttDevice.onKeyDown(keyCode, event);
+
         if (this.pttHyteraDebug) {
             Toast.makeText(getApplicationContext(), String.format(Locale.CANADA, "KeyCode: %d", keyCode), Toast.LENGTH_SHORT).show();
         }
 
-        if (this.pttHyteraMode) {
-            if (keyCode == KeyEvent.KEYCODE_F12) {
-                Intent intent = new Intent("aq.metallists.ptt_external");
-                intent.putExtra("new_ptt", true);
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                return true;
-            } else if (keyCode == KeyEvent.KEYCODE_F1) {
+        if (pttDevice instanceof HyteraPNC370Device /*|| pttDevice instanceof HyteraPNC380Device*/) {
+            if (keyCode == KeyEvent.KEYCODE_F1) {
                 navController.navigate(R.id.nav_settings);
             } else if (keyCode == KeyEvent.KEYCODE_F2) {
                 navController.navigate(R.id.nav_channellist);
@@ -222,6 +227,37 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 ListView chatroomList = (ListView) findViewById(R.id.networks_list);
                 if (chatroomList != null) {
                     chatroomList.performClick();
+                }
+            }
+        }
+
+        if (pttDevice instanceof HyteraPNC370SEDevice) {
+            if (keyCode == KeyEvent.KEYCODE_CALL) {
+                NavDestination nd = navController.getCurrentDestination();
+                if (nd != null && nd.getId() == R.id.nav_channellist) {
+                    navController.popBackStack();
+                } else {
+                    navController.navigate(R.id.nav_channellist);
+                }
+            } else if (keyCode == KeyEvent.KEYCODE_F2) {
+                NavDestination nd = navController.getCurrentDestination();
+                if (nd != null && nd.getId() == R.id.nav_settings) {
+                    navController.popBackStack();
+                    keyCode = KeyEvent.KEYCODE_BUTTON_2;
+                } else {
+                    navController.navigate(R.id.nav_settings);
+                }
+            }
+        }
+
+        if (pttDevice instanceof TeloTE590Device) {
+            // top button above ptt
+            if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN_LEFT) {
+                NavDestination nd = navController.getCurrentDestination();
+                if (nd != null && nd.getId() == R.id.nav_channellist) {
+                    navController.popBackStack();
+                } else {
+                    navController.navigate(R.id.nav_channellist);
                 }
             }
         }
@@ -236,41 +272,74 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if ((this.pttUseVU && keyCode == KeyEvent.KEYCODE_VOLUME_UP) ||
-                (this.pttUseVD && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
-            Intent intent = new Intent("aq.metallists.ptt_external");
-            intent.putExtra("new_ptt", false);
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-            return true;
-        }
-
-        if (this.pttHyteraMode) {
-            if (keyCode == KeyEvent.KEYCODE_F12) {
-                Intent intent = new Intent("aq.metallists.ptt_external");
-                intent.putExtra("new_ptt", false);
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                return true;
-            }
-        }
+        pttDevice.onKeyUp(keyCode, event);
 
         return super.onKeyDown(keyCode, event);
     }
 
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     protected void onResume() {
         super.onResume();
         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent("aq.metallists.request_data_update"));
+        EventBus.getDefault().post(new PRequestDataUpdate());
 
         setupExternalPtt();
         setupScreenLock();
+
+        ((AudioManager) getSystemService(AUDIO_SERVICE))
+                .registerMediaButtonEventReceiver(new ComponentName(this, PttReceiver.class));
+
+    }
+
+    TstServiceConnection htc;
+
+    class TstServiceConnection extends ContentObserver implements ServiceConnection {
+        public TstServiceConnection() {
+            super(new Handler(new Handler.Callback() {
+                @Override
+                public boolean handleMessage(@NonNull Message msg) {
+                    Toast.makeText(getApplicationContext(), "HandlerCTX!!", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }));
+        }
+
+        public final void onChange(boolean z2) {
+            int i = 0;
+            try {
+                i = Settings.System.getInt(getContentResolver(), "ptt_status");
+                Toast.makeText(getApplicationContext(), String.format(Locale.CANADA, "HCPC: %d", i), Toast.LENGTH_SHORT).show();
+                Logger.getInstance().w("TstServiceConnection.onChange[PTT]: ".concat(Integer.toString(i)));
+            } catch (Exception x) {
+                Logger.getInstance().w("TstServiceConnection.onChange", x);
+            }
+            Logger.getInstance().w("TstServiceConnection.onChange (i):".concat(Integer.toString(i)));
+
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Logger.getInstance().w("TstServiceConnection.onServiceConnected");
+            android.os.IInterface iifc = service.queryLocalInterface("com.hytera.call.service.IHytCallManagerService");
+            android.net.Uri ptts = android.provider.Settings.System.getUriFor("ptt_status");
+            getContentResolver().registerContentObserver(ptts, true, this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Logger.getInstance().w("TstServiceConnection.onServiceDisconnected");
+            getContentResolver().unregisterContentObserver(this);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).unregisterOnSharedPreferenceChangeListener(this);
+        ((AudioManager) getSystemService(AUDIO_SERVICE))
+                .unregisterMediaButtonEventReceiver(new ComponentName(this, PttReceiver.class));
     }
 
     protected void doCreateNotificationChannels() {
@@ -299,5 +368,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         setupExternalPtt();
         setupScreenLock();
+    }
+
+    public static class PttReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (pttDevice != null) {
+                pttDevice.onReceive(context, intent);
+            }
+        }
     }
 }

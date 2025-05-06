@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/teal_200" android:state_pressed="false" />
+    <item android:drawable="@color/teal_200" android:state_hovered="false" />
+    <item android:drawable="@color/green" android:state_focused="true" />
+    <item android:drawable="@color/green" android:state_hovered="true" />
+    <item android:drawable="@color/green" android:state_selected="true" />
+    <item android:drawable="@color/green" android:state_active="true" />
+    <item android:drawable="@color/green" android:state_activated="true" />
+    <item android:drawable="@color/green" android:state_pressed="true" />
+</selector>

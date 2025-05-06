@@ -5,7 +5,7 @@ public class FSUser {
     protected String email="";
     protected String password = "";
     protected String callsign = "";
-    protected String decaription = "";
+    protected String description = "";
     protected String country = "";
     protected String city = "";
 
@@ -25,8 +25,8 @@ public class FSUser {
     public String getCallsign(){
         return this.callsign;
     }
-    public String getDecaription(){
-        return this.decaription;
+    public String getDescription(){
+        return this.description;
     }
     public String getCountry(){
         return this.country;

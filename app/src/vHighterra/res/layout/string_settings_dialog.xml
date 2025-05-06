@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="85dp"
+    android:background="#3E80B4"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/frm_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="2dp"
+        android:background="#FFFFFF"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="2dp">
+
+        <Button
+            android:id="@+id/frm_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/s_baton_confirmx"
+            android:text="@string/label_btn_save"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/frm_abort"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/selectable_button"
+            android:text="@string/label_btn_clear" />
+    </LinearLayout>
+</LinearLayout>

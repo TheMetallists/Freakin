@@ -2,7 +2,7 @@ package aq.metallists.freundschaft.vocoder;
 
 import java.util.Locale;
 
-import aq.metallists.freundschaft.overridable.SoundLevelReceiver;
+import aq.metallists.freundschaft.overridable.FSSoundInterface;
 import aq.metallists.freundschaft.tools.Logger;
 
 public class GSMNativeVocoder {
@@ -13,7 +13,7 @@ public class GSMNativeVocoder {
     long hVoc;
     public boolean doCompressor = false;
     public boolean doLpf = false;
-    public SoundLevelReceiver xlr = null;
+    public FSSoundInterface xlr = null;
 
     public GSMNativeVocoder(boolean useCompressor, boolean useLPF) {
         this.doCompressor = useCompressor;
@@ -23,7 +23,7 @@ public class GSMNativeVocoder {
         Logger.getInstance().i(String.format(Locale.CANADA,"JVOCODER VERIFY: %s",Long.toString(this.hVoc)));
     }
 
-    public void connectXLRJack(SoundLevelReceiver _xlr) {
+    public void connectXLRJack(FSSoundInterface _xlr) {
         this.xlr = _xlr;
     }
 
